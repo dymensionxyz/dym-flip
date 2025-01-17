@@ -1,0 +1,17 @@
+.card {
+    background-color: #ffffff99;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px 2px #0a0a0a33;
+    padding: var(--padding);
+
+    &.small {
+        padding: var(--padding-small);
+        border-radius: 6px;
+    }
+
+    &.large {
+        border-radius: 16px;
+        padding: var(--padding-large);
+    }
+}
+

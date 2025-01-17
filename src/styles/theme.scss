@@ -1,0 +1,18 @@
+:root {
+    --primary-color: #1976d2;
+    --primary-color-dark: #1766b4;
+    --cream: #f1e1d4;
+    --padding: 24px;
+    --padding-small: 16px;
+    --padding-large: 32px;
+    --main-card-width: 448px;
+}
+
+@media only screen and (max-width: 1024px) {
+    :root {
+        --padding: 16px;
+        --padding-small: 12px;
+        --padding-large: 24px;
+        --main-card-width: 360px;
+    }
+}

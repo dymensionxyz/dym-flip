@@ -1,0 +1,125 @@
+.game-card {
+    width: var(--main-card-width);
+    max-width: calc(100% - var(--padding) * 2);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    .card-title {
+        text-align: center;
+    }
+
+    .coin-container {
+        width: 256px;
+        height: 256px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transform: rotateY(0);
+        transition: transform 500ms ease-in-out;
+
+        .coin-image {
+            width: 100%;
+            height: 100%;
+        }
+
+        .dymension-logo {
+            left: initial !important;
+            top: initial !important;
+            right: initial !important;
+            bottom: initial !important;
+            width: 50% !important;
+            height: 50% !important;
+            backface-visibility: hidden;
+            transform: rotateY(180deg);
+            transition: transform 500ms ease-in-out;
+        }
+
+        .dym {
+            position: absolute;
+            font-size: 56px;
+            text-align: center;
+            backface-visibility: hidden;
+            font-weight: bold;
+            user-select: none;
+            color: var(--cream);
+            transition: transform 300ms ease-in-out;
+        }
+
+        &.logo {
+            transform: rotateY(180deg);
+
+            .dymension-logo {
+                transform: rotateY(0);
+            }
+
+            .dym {
+                transform: rotateY(180deg);
+            }
+        }
+
+        &.flipping {
+            transform: rotateY(0);
+
+            .coin-image, .dymension-logo {
+                animation: flip 300ms infinite linear;
+            }
+
+            .dym {
+                animation: flip-backface 300ms infinite linear;
+            }
+        }
+    }
+
+    .label {
+        text-align: center;
+        color: #575757;
+        margin: var(--padding) 0 8px;
+    }
+
+    .bet-input {
+        text-align: center;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .flip-button {
+        margin-top: var(--padding-small);
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .game-card .coin-container {
+        width: 200px;
+        height: 200px;
+    }
+}
+
+@keyframes flip {
+    0% {
+        transform: rotateY(0deg);
+    }
+    50% {
+        transform: rotateY(180deg);
+    }
+    100% {
+        transform: rotateY(360deg);
+    }
+}
+
+
+@keyframes flip-backface {
+    0% {
+        transform: rotateY(180deg);
+    }
+    50% {
+        transform: rotateY(360deg);
+    }
+    100% {
+        transform: rotateY(540deg);
+    }
+}
+
