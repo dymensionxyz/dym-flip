@@ -1,5 +1,6 @@
 'use client';
 
+import { CoinFlipContractFunction } from '@/core/types';
 import React from 'react';
 import Card from '@/components/card/card';
 import Spinner from '@/components/spinner/spinner';
@@ -8,7 +9,15 @@ import { formatNumber } from '@/utils/number-utils';
 import './house-info.scss';
 
 const HouseInfo: React.FC = () => {
-    const { rewards, gameStatusLoading, minBet, maxBet } = useGame();
+    const {
+        rewards,
+        gameStatusLoading,
+        minBet,
+        maxBet,
+        broadcastingMessage,
+        flipping,
+        claimRewards,
+    } = useGame();
 
     return (
         <Card className='house-info'>
@@ -25,7 +34,14 @@ const HouseInfo: React.FC = () => {
                     Rewards<b className='info-property-value'>{formatNumber(rewards || 0)} DYM</b>
                 </p>
 
-                <button className='button claim-button' disabled={!rewards}>Claim</button>
+                <button
+                    className='button claim-button'
+                    disabled={Boolean(!rewards || broadcastingMessage || flipping)}
+                    onClick={() => claimRewards()}
+                >
+                    Claim{broadcastingMessage === CoinFlipContractFunction.withdraw ?
+                    <>&nbsp;<Spinner size='small' /></> : undefined}
+                </button>
             </>}
         </Card>
     );

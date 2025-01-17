@@ -1,6 +1,8 @@
 export const JSON_RPC = 'https://json-rpc.ra-1.rollapp.network';
 export const COIN_FLIP_CONTRACT_ADDRESS = '0xfae52eaFEB6bac9413a7210228D78AE036D348c9';
 
+export const DEFAULT_BROADCAST_ATTEMPTS = 3;
+
 export enum CoinSide {
     DYM, LOGO
 }
@@ -44,5 +46,5 @@ export const LOSING_MESSAGES = [
 
 
 export enum CoinFlipContractFunction {
-    startGame = 'startGame', completeGame = 'completeGame'
+    startGame = 'startGame', completeGame = 'completeGame', withdraw = 'withdraw'
 }

@@ -3,7 +3,7 @@
 import Card from '@/components/card/card';
 import Spinner from '@/components/spinner/spinner';
 import { useGame } from '@/core/game-context';
-import { CoinSide } from '@/core/types';
+import { CoinFlipContractFunction, CoinSide } from '@/core/types';
 import classNames from 'classnames';
 import Image from 'next/image';
 import React, { FormEvent, useCallback, useMemo } from 'react';
@@ -57,6 +57,13 @@ const GameCard: React.FC = () => {
         setBet(inputElement.value);
     }, [ bet, maxBet, minBet, setBet ]);
 
+
+    const isFlipButtonLoading = useMemo(
+        () => (flipping && !canReveal) || broadcastingMessage === CoinFlipContractFunction.startGame ||
+            broadcastingMessage === CoinFlipContractFunction.completeGame,
+        [ broadcastingMessage, canReveal, flipping ],
+    );
+
     return (
         <Card className='game-card' size='large'>
             <h1 className='card-title'>Dym Flip</h1>
@@ -82,11 +89,11 @@ const GameCard: React.FC = () => {
 
             <button
                 className='button flip-button large'
-                disabled={!Number(bet) || !balance || Boolean(broadcastingMessage) || (flipping && !canReveal)}
+                disabled={Boolean(!Number(bet) || !balance || broadcastingMessage || (flipping && !canReveal))}
                 onClick={() => flipping ? completeGame() : startGame()}
             >
                 {flipping ? 'Reveal' : 'Flip'}
-                {broadcastingMessage ? <>&nbsp;<Spinner size='small' /></> : undefined}
+                {isFlipButtonLoading ? <>&nbsp;<Spinner size='small' /></> : undefined}
             </button>
         </Card>
     );
