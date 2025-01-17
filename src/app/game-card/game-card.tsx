@@ -6,7 +6,7 @@ import { useGame } from '@/core/game-context';
 import { CoinSide } from '@/core/types';
 import classNames from 'classnames';
 import Image from 'next/image';
-import React, { FormEvent, useCallback, useMemo, useState } from 'react';
+import React, { FormEvent, useCallback, useMemo } from 'react';
 import './game-card.scss';
 
 const GameCard: React.FC = () => {
@@ -18,11 +18,12 @@ const GameCard: React.FC = () => {
         coinSide,
         broadcastingMessage,
         canReveal,
+        bet,
+        setBet,
         setCoinSide,
         startGame,
         completeGame,
     } = useGame();
-    const [ bet, setBet ] = useState<string>();
 
     const inputDisabled = useMemo(
         () => balance === undefined || maxBet === undefined || minBet === undefined || flipping ||
@@ -54,7 +55,7 @@ const GameCard: React.FC = () => {
             return;
         }
         setBet(inputElement.value);
-    }, [ bet, maxBet, minBet ]);
+    }, [ bet, maxBet, minBet, setBet ]);
 
     return (
         <Card className='game-card' size='large'>
@@ -82,7 +83,7 @@ const GameCard: React.FC = () => {
             <button
                 className='button flip-button large'
                 disabled={!Number(bet) || !balance || Boolean(broadcastingMessage) || (flipping && !canReveal)}
-                onClick={() => flipping ? completeGame() : startGame(Number(bet))}
+                onClick={() => flipping ? completeGame() : startGame()}
             >
                 {flipping ? 'Reveal' : 'Flip'}
                 {broadcastingMessage ? <>&nbsp;<Spinner size='small' /></> : undefined}

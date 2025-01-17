@@ -9,6 +9,7 @@ export interface GameResult {
     status: bigint;
     won: boolean;
     playerChoice: bigint;
+    betAmount: bigint;
 }
 
 export interface ContractMessage {
