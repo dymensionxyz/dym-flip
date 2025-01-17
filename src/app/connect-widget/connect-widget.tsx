@@ -6,7 +6,7 @@ import { formatEther } from 'ethers';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './connect-widget.scss';
 
-const DYMENSION_CONNECT_URL = 'http://localhost:3002';
+const DYMENSION_CONNECT_URL = 'https://testnet.dymension.xyz';
 const DYMENSION_CONNECT_NETWORK_IDS = [ 'dymflip_248217-1' ];
 
 const ConnectWidget: React.FC = () => {
