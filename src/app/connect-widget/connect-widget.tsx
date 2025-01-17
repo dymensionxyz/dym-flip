@@ -1,12 +1,13 @@
 'use client';
 
 import { useGame } from '@/core/game-context';
+import { showErrorToast, showWarningToast } from '@/core/utils/toast-utils';
 import { getShortenedAddress } from '@/utils/address-utils';
 import { formatEther } from 'ethers';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './connect-widget.scss';
 
-const DYMENSION_CONNECT_URL = 'https://testnet.dymension.xyz';
+const DYMENSION_CONNECT_URL = 'https://testnet.dymension.xyz/';
 const DYMENSION_CONNECT_NETWORK_IDS = [ 'dymflip_248217-1' ];
 
 const ConnectWidget: React.FC = () => {
@@ -48,10 +49,68 @@ const ConnectWidget: React.FC = () => {
         sendMessage({ type: 'setMenuAlign', align: 'right' });
     }, [ sendMessage, updateTriggerBoundingRect ]);
 
-    console.log('>>>>>>>>>>>>', contractMessageToExecute);
+    const handleWalletError = useCallback(({
+        code,
+        walletType,
+        originalError,
+    }: { code?: string, walletType?: string, originalError?: any }) => {
+        if (!code) {
+            return;
+        }
+        switch (code) {
+            case 'FAILED_INTEGRATE_CHAIN':
+                if (originalError?.message?.toLowerCase()?.includes('ledger is unsupported')) {
+                    showErrorToast(`${walletType || 'The wallet'} is currently not supporting this chain with Ledger.`);
+                } else {
+                    showErrorToast(`Failed integrate chain with ${walletType || 'the wallet'}`);
+                }
+                break;
+            case 'FAILED_INIT_WALLET':
+                showErrorToast(`Failed init ${walletType || 'the wallet'}`);
+                break;
+            case 'KEY_NOT_FOUND':
+                showWarningToast(`Create or import an account in your ${walletType || 'wallet'}`);
+                break;
+            case 'NO_OFFLINE_SIGNER':
+                showErrorToast(`${walletType || 'The wallet'} account not detected`);
+                break;
+            case 'UNSUPPORTED_WALLET':
+                showErrorToast(`${walletType || 'The selected wallet is'} not supported`);
+                break;
+            case 'UPGRADE_WALLET':
+                showWarningToast(`Please use the recent version of ${walletType || 'the wallet'} extension`);
+                break;
+            case 'WALLET_NOT_CONNECTED':
+                showWarningToast('No wallet connected for this chain');
+                break;
+            case 'INSTALL_WALLET':
+                showWarningToast(`${walletType || 'The'} wallet not installed`);
+                break;
+            case 'UNSUPPORTED_NETWORK':
+                showErrorToast(`Can't link ${walletType || 'the'} wallet to the designated network`);
+                break;
+            case 'ACCOUNTS_ALREADY_REQUESTED':
+                showErrorToast(`Connect to ${walletType || 'the wallet'}`);
+                break;
+            case 'REQUEST_REJECTED':
+                showWarningToast(`Connecting to ${walletType || 'the wallet'} rejected by the user`);
+                break;
+            case 'SWITCH_NETWORK':
+                showErrorToast(`Switch to this chain in ${walletType || 'the wallet'}`);
+                break;
+            case 'UNSUPPORTED_MESSAGE':
+                if (walletType === 'Quick Auth') {
+                    showWarningToast('Quick Auth session has expired');
+                } else {
+                    showWarningToast(`This message not supported by ${walletType || 'the wallet'}`);
+                }
+                break;
+            default:
+                showWarningToast(`${walletType || 'Wallet'} connection failed, please try again later`);
+        }
+    }, []);
 
     useEffect(() => {
-        console.log('-----', contractMessageToExecute);
         if (contractMessageToExecute) {
             sendMessage({ type: 'executeEthTx', contract: contractMessageToExecute });
             setContractMessageExecuted();
@@ -87,22 +146,27 @@ const ConnectWidget: React.FC = () => {
             }
             if (event.data.type === 'disconnect') {
                 setAddresses('', '');
-                setBalance(undefined);
+                setBalance(0);
                 updateTriggerBoundingRect();
             }
             if (event.data.type === 'tx-response') {
                 handleTxResponse(event.data);
             }
-            // if (event.data.type === 'notification') {
-            //     setNotifications(event.data.messages);
-            // }
-            // if (event.data.type === 'wallet-error') {
-            //     setTimeout(() => alert(event.data.error?.message), 50);
-            // }
+            if (event.data.type === 'wallet-error') {
+                handleWalletError(JSON.parse(event.data.error || '{}'));
+            }
         };
         window.addEventListener('message', handleMessage);
         return () => window.removeEventListener('message', handleMessage);
-    }, [ initModal, setAddresses, sendMessage, setBalance, updateTriggerBoundingRect, handleTxResponse ]);
+    }, [
+        initModal,
+        setAddresses,
+        sendMessage,
+        setBalance,
+        updateTriggerBoundingRect,
+        handleTxResponse,
+        handleWalletError,
+    ]);
 
     return (
         <>

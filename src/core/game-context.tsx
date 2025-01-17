@@ -10,9 +10,9 @@ import {
     LOSING_MESSAGES,
     SUCCESS_MESSAGES,
 } from '@/core/types';
+import { showErrorToast, showSuccessToast } from '@/core/utils/toast-utils';
 import { ethers, formatEther } from 'ethers';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
-import { Bounce, toast } from 'react-toastify';
 import Web3 from 'web3';
 
 const web3 = new Web3(new Web3.providers.HttpProvider(JSON_RPC));
@@ -29,6 +29,7 @@ interface GameContextValue {
     broadcastingMessage?: string;
     bet?: string;
     canReveal: boolean;
+    gameStatusLoading: boolean;
     coinSide: CoinSide;
     contractMessageToExecute?: ContractMessage;
     setAddresses: (address: string, hexAddress: string) => void;
@@ -54,6 +55,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
     const [ rewards, setRewards ] = useState<number>();
     const [ flipping, setFlipping ] = useState(false);
     const [ canReveal, setCanReveal ] = useState(false);
+    const [ gameStatusLoading, setGameStatusLoading ] = useState(true);
     const [ bet, setBet ] = useState<string>();
     const [ broadcastingMessage, setBroadcastingMessage ] = useState<string>();
     const [ coinSide, setCoinSide ] = useState<CoinSide>(CoinSide.LOGO);
@@ -64,48 +66,42 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
         setHexAddress(hexAddress);
     }, []);
 
-    const showErrorToast = useCallback((message: string) => toast.error(message, {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: true,
-        theme: 'colored',
-        transition: Bounce,
-    }), []);
-
-    const showSuccessToast = useCallback((message: string) => toast.success(message, {
-        position: 'top-center',
-        autoClose: 5000,
-        hideProgressBar: true,
-        theme: 'colored',
-        transition: Bounce,
-    }), []);
-
     const updateGameStatus = useCallback((lastGameResult?: boolean) => {
-        if (!hexAddress) {
+        if (hexAddress === undefined || balance === undefined) {
             return;
         }
-        try {
+        if (!hexAddress) {
+            setGameStatusLoading(false);
+            setFlipping(false);
+            setCanReveal(false);
+            setRewards(undefined);
+            setMinBet(undefined);
+            setMaxBet(undefined);
+            setBroadcastingMessage(undefined);
+            return;
+        }
+        const promises = [
             flipContract.methods.getBalance(hexAddress).call()
-                .then((result) => setRewards(Number(formatEther(result?.toString() || '0'))));
+                .then((result) => setRewards(Number(formatEther(result?.toString() || '0')))),
             flipContract.methods.minBetAmount().call()
-                .then((result) => setMinBet(Number(formatEther(result?.toString() || '0'))));
+                .then((result) => setMinBet(Number(formatEther(result?.toString() || '0')))),
             flipContract.methods.calculateMaxBetAmount().call()
-                .then((result) => setMaxBet(Number(formatEther(result?.toString() || '0'))));
-            if (lastGameResult) {
-                flipContract.methods.gameByPlayer(hexAddress).call().then((result: any) => {
+                .then((result) => setMaxBet(Number(formatEther(result?.toString() || '0')))),
+            !lastGameResult ? Promise.resolve() : flipContract.methods.gameByPlayer(hexAddress).call()
+                .then((result: any) => {
                     const gameResult = result as GameResult;
                     if (gameResult.status === BigInt(1)) {
                         setFlipping(true);
                         setCanReveal(true);
                         setBet(formatEther(gameResult.betAmount));
                     }
-                });
-            }
-        } catch (error) {
+                }),
+        ];
+        Promise.all(promises).catch((error) => {
             console.error(error);
             showErrorToast(`Can't load data, please try again later`);
-        }
-    }, [ hexAddress, showErrorToast ]);
+        }).finally(() => setGameStatusLoading(false));
+    }, [ balance, hexAddress ]);
 
     useEffect(() => updateGameStatus(true), [ updateGameStatus ]);
 
@@ -150,7 +146,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             console.error(error);
             showErrorToast(`Can't fetch game status, please try again later`);
         }
-    }, [ hexAddress, showErrorToast, showSuccessToast ]);
+    }, [ hexAddress ]);
 
     const handleTxResponse = useCallback(({ response, error }: { response: any, error: any }) => {
         setBroadcastingMessage(undefined);
@@ -158,9 +154,11 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
             if (broadcastingMessage === 'startGame') {
                 setCanReveal(true);
                 updateGameStatus();
+                setTimeout(() => completeGame(), 5000);
             } else if (broadcastingMessage === 'completeGame') {
                 setFlipping(false);
                 setCanReveal(false);
+                setBet(undefined);
                 updateGameStatus();
                 handleLastGameResult().then();
             }
@@ -171,7 +169,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
                 setFlipping(false);
             }
         }
-    }, [ broadcastingMessage, handleLastGameResult, showErrorToast, updateGameStatus ]);
+    }, [ broadcastingMessage, completeGame, handleLastGameResult, updateGameStatus ]);
 
     return (
         <GameContext.Provider
@@ -191,6 +189,7 @@ export const GameContextProvider = ({ children }: { children: ReactNode }) => {
                 contractMessageToExecute,
                 handleTxResponse,
                 broadcastingMessage,
+                gameStatusLoading,
                 completeGame,
                 bet,
                 setBet,

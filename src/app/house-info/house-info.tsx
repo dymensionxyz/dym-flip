@@ -8,11 +8,11 @@ import { formatNumber } from '@/utils/number-utils';
 import './house-info.scss';
 
 const HouseInfo: React.FC = () => {
-    const { rewards, minBet, maxBet } = useGame();
+    const { rewards, gameStatusLoading, minBet, maxBet } = useGame();
 
     return (
         <Card className='house-info'>
-            {rewards === undefined ? <Spinner size='small' className='info-spinner' /> : <>
+            {gameStatusLoading ? <Spinner size='small' className='info-spinner' /> : <>
                 <p className='info-property'>
                     Min Bet<b className='info-property-value'>{formatNumber(minBet || 0)} DYM</b>
                 </p>
