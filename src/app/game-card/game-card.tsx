@@ -64,6 +64,11 @@ const GameCard: React.FC = () => {
         [ broadcastingMessage, canReveal, flipping ],
     );
 
+    const flipButtonDisabled = useMemo(
+        () => Boolean(!Number(bet) || !balance || broadcastingMessage || (flipping && !canReveal)),
+        [ balance, bet, broadcastingMessage, canReveal, flipping ],
+    );
+
     return (
         <Card className='game-card' size='large'>
             <h1 className='card-title'>Dym Flip</h1>
@@ -88,8 +93,8 @@ const GameCard: React.FC = () => {
             />
 
             <button
-                className='button flip-button large'
-                disabled={Boolean(!Number(bet) || !balance || broadcastingMessage || (flipping && !canReveal))}
+                className={classNames('button flip-button large', { glow: flipping && !flipButtonDisabled })}
+                disabled={flipButtonDisabled}
                 onClick={() => flipping ? completeGame() : startGame()}
             >
                 {flipping ? 'Reveal' : 'Flip'}

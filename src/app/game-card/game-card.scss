@@ -88,6 +88,12 @@
     .flip-button {
         margin-top: var(--padding-small);
         width: 100%;
+
+        &.glow {
+            background-color: rgb(var(--green-color-rgb));
+            box-shadow: 0 0 8px 4px rgba(var(--green-color-rgb), 0.4);
+            animation: float 2.5s ease-in-out infinite;
+        }
     }
 }
 
@@ -120,6 +126,15 @@
     }
     100% {
         transform: rotateY(540deg);
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: scale(1) rotateX(0deg);
+    }
+    50% {
+        transform: scale(1.08) rotateX(8deg);
     }
 }
 
