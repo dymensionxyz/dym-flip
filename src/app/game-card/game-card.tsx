@@ -6,7 +6,7 @@ import { useGame } from '@/core/game-context';
 import { CoinFlipContractFunction, CoinSide } from '@/core/types';
 import classNames from 'classnames';
 import Image from 'next/image';
-import React, { FormEvent, useCallback, useMemo } from 'react';
+import React, { FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import './game-card.scss';
 
 const GameCard: React.FC = () => {
@@ -24,6 +24,7 @@ const GameCard: React.FC = () => {
         startGame,
         completeGame,
     } = useGame();
+    const [ ready, setReady ] = useState(false);
 
     const inputDisabled = useMemo(
         () => balance === undefined || maxBet === undefined || minBet === undefined || flipping ||
@@ -69,13 +70,24 @@ const GameCard: React.FC = () => {
         [ balance, bet, broadcastingMessage, canReveal, flipping ],
     );
 
+    useEffect(() => {
+        if (ready) {
+            return;
+        }
+        setTimeout(() => setCoinSide(CoinSide.DYM), 200);
+        setTimeout(() => {
+            setCoinSide(CoinSide.LOGO);
+            setReady(true);
+        }, 700);
+    }, [ ready, setCoinSide ]);
+
     return (
         <Card className='game-card' size='large'>
             <div
                 className={classNames('coin-container', { logo: coinSide === CoinSide.LOGO, flipping })}
-                onClick={() => setCoinSide(coinSide === CoinSide.LOGO ? CoinSide.DYM : CoinSide.LOGO)}
+                onClick={() => ready && setCoinSide(coinSide === CoinSide.LOGO ? CoinSide.DYM : CoinSide.LOGO)}
             >
-                <Image src='/coin-img.png' fill alt='coin' className='coin-image' />
+                <Image src='/coin.png' fill alt='coin' className='coin-image' />
                 <Image src='/dymension-logo-light.svg' fill alt='dymension-logo' className='dymension-logo' />
                 <span className='dym'>DYM</span>
             </div>
@@ -89,7 +101,7 @@ const GameCard: React.FC = () => {
 
             <button
                 className={classNames('button flip-button large', { glow: flipping && !flipButtonDisabled })}
-                disabled={flipButtonDisabled}
+                disabled={!ready || flipButtonDisabled}
                 onClick={() => flipping ? completeGame() : startGame()}
             >
                 {flipping ? 'Reveal' : 'Flip'}

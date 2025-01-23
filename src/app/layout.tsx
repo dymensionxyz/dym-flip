@@ -7,11 +7,11 @@ const inter = Inter({ subsets: [ 'latin' ], variable: '--font-inter' });
 
 export const metadata: Metadata = {
     title: 'Dym Flip',
-    // icons: {
-    //     icon: '/favicon.ico',
-    //     apple: '/logo192.png',
-    // },
-    // manifest: '/manifest.json',
+    icons: {
+        icon: '/favicon.ico',
+        apple: '/logo192.png',
+    },
+    manifest: '/manifest.json',
 };
 
 export const viewport: Viewport = {
