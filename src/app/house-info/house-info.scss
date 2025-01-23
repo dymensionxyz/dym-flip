@@ -28,7 +28,9 @@
 
         .info-property-value {
             font-size: 14px;
-            color: black;
+            color: linear-gradient(to left, #310c5d 0%, #f34404 100%);
+            background: linear-gradient(to left, #310c5d 0%, #f34404 100%);
+            -webkit-background-clip: text;
             margin-top: 4px;
         }
 

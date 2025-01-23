@@ -71,17 +71,14 @@ const GameCard: React.FC = () => {
 
     return (
         <Card className='game-card' size='large'>
-            <h4 className='label'>Click To Choose Side:</h4>
             <div
                 className={classNames('coin-container', { logo: coinSide === CoinSide.LOGO, flipping })}
                 onClick={() => setCoinSide(coinSide === CoinSide.LOGO ? CoinSide.DYM : CoinSide.LOGO)}
             >
-                <Image src='/coin.png' fill alt='coin' className='coin-image' />
+                <Image src='/coin-img.png' fill alt='coin' className='coin-image' />
                 <Image src='/dymension-logo-light.svg' fill alt='dymension-logo' className='dymension-logo' />
                 <span className='dym'>DYM</span>
             </div>
-
-            <h4 className='label'>Enter Your Bet (DYM):</h4>
             <input
                 className='input bet-input'
                 placeholder='0.00'
