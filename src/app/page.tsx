@@ -1,3 +1,4 @@
+import useWindowSize from '@/core/utils/use-window-size';
 import React from 'react';
 import { ToastContainer } from 'react-toastify';
 import ConnectWidget from '@/app/connect-widget/connect-widget';
@@ -10,9 +11,11 @@ export default function Home() {
     return (
         <main className='main'>
             <GameContextProvider>
-                <GameCard />
                 <ConnectWidget />
-                <HouseInfo />
+                <div className='cards-container'>
+                    <GameCard />
+                    <HouseInfo className='house-info' />
+                </div>
                 <ToastContainer />
             </GameContextProvider>
         </main>

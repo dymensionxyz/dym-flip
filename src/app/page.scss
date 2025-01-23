@@ -5,3 +5,21 @@
     align-items: center;
     justify-content: center;
 }
+
+.cards-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: var(--main-card-width);;
+    max-width: calc(100% - var(--padding) * 2);
+}
+
+@media only screen and (max-height: 780px) and (min-width: 1024px) {
+    .cards-container .house-info {
+        position: relative;
+        max-width: initial;
+        margin-top: var(--padding);
+        bottom: initial;
+        width: 100%;
+    }
+}

@@ -1,6 +1,7 @@
 'use client';
 
 import { CoinFlipContractFunction } from '@/core/types';
+import classNames from 'classnames';
 import React from 'react';
 import Card from '@/components/card/card';
 import Spinner from '@/components/spinner/spinner';
@@ -8,7 +9,11 @@ import { useGame } from '@/core/game-context';
 import { formatNumber } from '@/utils/number-utils';
 import './house-info.scss';
 
-const HouseInfo: React.FC = () => {
+interface HouseInfoProps {
+    className: string;
+}
+
+const HouseInfo: React.FC<HouseInfoProps> = ({ className }) => {
     const {
         rewards,
         gameStatusLoading,
@@ -20,7 +25,7 @@ const HouseInfo: React.FC = () => {
     } = useGame();
 
     return (
-        <Card className='house-info'>
+        <Card className={classNames('house-info', className)}>
             {gameStatusLoading ? <Spinner size='small' className='info-spinner' /> : <>
                 <p className='info-property'>
                     Min Bet<b className='info-property-value'>{formatNumber(minBet || 0)} DYM</b>

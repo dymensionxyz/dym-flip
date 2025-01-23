@@ -71,8 +71,6 @@ const GameCard: React.FC = () => {
 
     return (
         <Card className='game-card' size='large'>
-            <h1 className='card-title'>Dym Flip</h1>
-
             <h4 className='label'>Click To Choose Side:</h4>
             <div
                 className={classNames('coin-container', { logo: coinSide === CoinSide.LOGO, flipping })}
